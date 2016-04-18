@@ -1,7 +1,6 @@
 # Show The Shortcut
 
-<!-- Replace this badge with your own-->
-[![Build status](https://ci.appveyor.com/api/projects/status/hv6uyc059rqbc6fj?svg=true)](https://ci.appveyor.com/project/madskristensen/extensibilitytools)
+[![Build status](https://ci.appveyor.com/api/projects/status/3cydl7ohrtn9we2u?svg=true)](https://ci.appveyor.com/project/madskristensen/showtheshortcut)
 
 <!-- Update the VS Gallery link after you upload the VSIX-->
 Download this extension from the [VS Gallery](https://visualstudiogallery.msdn.microsoft.com/[GuidFromGallery])
@@ -9,24 +8,30 @@ or get the [CI build](http://vsixgallery.com/extension/9da28329-f9d5-4f18-91c3-d
 
 ---------------------------------------
 
-Shows the keyboard shortcut for any command that you execute to help you learn the shortcuts you use the most.
+Shows the keyboard shortcut for any command that you execute
+to help you learn the shortcuts you use the most.
+
+It is also helpful for presentations where you want to display
+what keyboard shortcuts you are usign to the audience.
 
 See the [changelog](CHANGELOG.md) for changes and roadmap.
 
 ## Features
 
-- Feature 1
-- Feature 2
-  - Sub feature
+- Displays the keyboard shortcut in the status bar
+- Auto-hides the shortcut after 5 seconds (default setting)
+- Doesn't show when a command was invoked by a shortcut
 
-### Feature 1
-Describe feature 1. Add screenshots/code samples etc.
+When a command is invoked from a button click (such as
+*Edit -> Find and Replace -> Quick Find*) and there is a
+keyboard shortcut bound to that command, that keyboard
+shortcut will be displayed in the status bar.
 
-### Feature 2
-Describe feature 2. Add screenshots/code samples etc.
+![Status bar](art/statusbar.png)
 
-#### Sub feature
-Describe sub feature. Add screenshots/code samples etc.
+### Settings
+
+![Options](art/options.png)
 
 ## Contribute
 Check out the [contribution guidelines](CONTRIBUTING.md)
