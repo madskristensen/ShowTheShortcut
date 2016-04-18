@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Nothing yet...
+- [ ] Log to output window
 
 Features that have a checkmark are complete and available for
 download in the

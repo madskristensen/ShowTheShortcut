@@ -41,8 +41,7 @@ namespace ShowTheShortcut
 
             _timer = new Timer();
 
-            if (_options.Timeout > 0)
-                _timer.Interval = _options.Timeout * 1000;
+            SetTimeout();
 
             _timer.Elapsed += (s, e) =>
             {
@@ -55,8 +54,16 @@ namespace ShowTheShortcut
 
             _options.Saved += (s, e) =>
             {
-                _timer.Interval = _options.Timeout * 1000;
+                SetTimeout();
             };
+        }
+
+        private void SetTimeout()
+        {
+            if (_options.Timeout > 0)
+                _timer.Interval = _options.Timeout * 1000;
+            else
+                _timer.Stop();
         }
 
         public static CommandHandler Instance { get; private set; }
