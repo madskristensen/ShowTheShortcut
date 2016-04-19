@@ -90,7 +90,7 @@ namespace ShowTheShortcut
                 var cmd = _dte.Commands.Item(Guid, ID);
                 string shortcut = GetShortcut(cmd);
 
-                if (IsShortcutInteresting(shortcut))
+                if (!string.IsNullOrWhiteSpace(shortcut))
                 {
                     string text = $"{cmd.Name} ({shortcut})";
                     _control.Visibility = Visibility.Visible;
@@ -108,18 +108,7 @@ namespace ShowTheShortcut
                 Logger.Log(ex);
             }
         }
-
-        private static bool IsShortcutInteresting(string shortcut)
-        {
-            if (string.IsNullOrWhiteSpace(shortcut))
-                return false;
-
-            if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
-                return false;
-
-            return true;
-        }
-
+        
         private static string GetShortcut(Command cmd)
         {
             if (cmd == null || string.IsNullOrEmpty(cmd.Name))
@@ -137,6 +126,9 @@ namespace ShowTheShortcut
                 int index = bindings.IndexOf(':') + 2;
                 string shortcut = bindings.Substring(index);
 
+                if (!IsShortcutInteresting(shortcut))
+                    shortcut = null;
+
                 if (!_cache.ContainsKey(key))
                     _cache.Add(key, shortcut);
 
@@ -144,6 +136,17 @@ namespace ShowTheShortcut
             }
 
             return null;
+        }
+
+        private static bool IsShortcutInteresting(string shortcut)
+        {
+            if (string.IsNullOrWhiteSpace(shortcut))
+                return false;
+
+            if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
+                return false;
+
+            return true;
         }
     }
 }
