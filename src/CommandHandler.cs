@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using EnvDTE;
 using EnvDTE80;
 
@@ -19,33 +17,27 @@ namespace ShowTheShortcut
         private static Dictionary<string, string> _cache = new Dictionary<string, string>();
         private Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
         private bool _showShortcut;
-        private StatusBarInjector _injector;
         private Timer _timer;
-        private TextBlock _control = new TextBlock
-        {
-            Foreground = Brushes.White,
-            FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(5, 4, 10, 0),
-            Visibility = Visibility.Collapsed
-        };
+        private StatusbarControl _control;
 
         private CommandHandler(IServiceProvider provider, Options options)
         {
             _options = options;
             _dte = (DTE2)provider.GetService(typeof(DTE));
+            _control = new StatusbarControl(options, _dte);
             _events = _dte.Events.CommandEvents;
 
             _events.AfterExecute += AfterExecute;
             _events.BeforeExecute += BeforeExecute;
 
-            _injector = new StatusBarInjector(Application.Current.MainWindow);
-            _injector.InjectControl(_control);
+            var injector = new StatusBarInjector(Application.Current.MainWindow);
+            injector.InjectControl(_control);
 
             _timer = new Timer();
             _timer.Elapsed += (s, e) =>
             {
                 _timer.Stop();
-                HideControl();
+                _control.SetVisibility(Visibility.Collapsed);
             };
 
             _options.Saved += (s, e) =>
@@ -53,21 +45,13 @@ namespace ShowTheShortcut
                 SetTimeout();
 
                 if (!_options.LogToStatusBar)
-                    HideControl();
+                    _control.SetVisibility(Visibility.Collapsed);
 
                 if (!_options.LogToOutputWindow)
                     Logger.DeletePane();
             };
 
             SetTimeout();
-        }
-
-        private void HideControl()
-        {
-            _control.Dispatcher.Invoke(() =>
-            {
-                _control.Visibility = Visibility.Collapsed;
-            });
         }
 
         private void SetTimeout()
@@ -112,17 +96,12 @@ namespace ShowTheShortcut
                         string prettyName = Prettify(cmd);
                         string text = $"{prettyName} ({shortcut})";
 
-                        _control.Visibility = Visibility.Visible;
+                        _control.SetVisibility(Visibility.Visible);
                         _control.Text = text;
                     }
 
                     if (_options.ShowTooltip)
-                    {
-                        _control.ToolTip = $@"Name: {cmd.Name}
-Localized: {cmd.LocalizedName}
-GUID: {cmd.Guid}
-ID: {cmd.ID}";
-                    }
+                        _control.SetTooltip(cmd);
 
                     if (_options.LogToOutputWindow)
                         Logger.Log($"{cmd.Name} ({shortcut})");

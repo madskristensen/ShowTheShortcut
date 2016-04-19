@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] nothing yet...
+- [x] Copy tooltip text on click
 
 Features that have a checkmark are complete and available for
 download in the

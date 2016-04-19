@@ -45,6 +45,10 @@ mouse hovers over the status bar.
 
 This can be helpful to anyone trying to automate Visual Studio.
 
+When the tooltip is visible and you click the status bar
+indicator, the content of the tooltip is copied to the
+clipboard.
+
 ### Output Window
 Every time a shortcut is displayed on the status bar, it is
 also logged in the Output Window. This makes it easy to
