@@ -90,7 +90,7 @@ namespace ShowTheShortcut
                 var cmd = _dte.Commands.Item(Guid, ID);
                 string shortcut = GetShortcut(cmd);
 
-                if (!string.IsNullOrEmpty(shortcut))
+                if (IsShortcutInteresting(shortcut))
                 {
                     string text = $"{cmd.Name} ({shortcut})";
                     _control.Visibility = Visibility.Visible;
@@ -107,6 +107,17 @@ namespace ShowTheShortcut
             {
                 Logger.Log(ex);
             }
+        }
+
+        private static bool IsShortcutInteresting(string shortcut)
+        {
+            if (string.IsNullOrWhiteSpace(shortcut))
+                return false;
+
+            if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
+                return false;
+
+            return true;
         }
 
         private static string GetShortcut(Command cmd)
