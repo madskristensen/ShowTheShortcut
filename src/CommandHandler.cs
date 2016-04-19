@@ -42,9 +42,6 @@ namespace ShowTheShortcut
             _injector.InjectControl(_control);
 
             _timer = new Timer();
-
-            SetTimeout();
-
             _timer.Elapsed += (s, e) =>
             {
                 _timer.Stop();
@@ -58,14 +55,21 @@ namespace ShowTheShortcut
             {
                 SetTimeout();
             };
+
+            SetTimeout();
         }
 
         private void SetTimeout()
         {
             if (_options.Timeout > 0)
+            {
                 _timer.Interval = _options.Timeout * 1000;
+                _timer.Start();
+            }
             else
+            {
                 _timer.Stop();
+            }
         }
 
         public static CommandHandler Instance { get; private set; }
@@ -92,15 +96,18 @@ namespace ShowTheShortcut
 
                 if (!string.IsNullOrWhiteSpace(shortcut))
                 {
-                    string text = $"{cmd.Name} ({shortcut})";
+                    string text = $"{cmd.LocalizedName} ({shortcut})";
                     _control.Visibility = Visibility.Visible;
                     _control.Text = text;
 
                     if (_options.LogToOutputWindow)
                         Logger.Log(text);
 
-                    _timer.Stop();
-                    _timer.Start();
+                    if (_options.Timeout > 0)
+                    {
+                        _timer.Stop();
+                        _timer.Start();
+                    }
                 }
             }
             catch (Exception ex)
@@ -108,7 +115,7 @@ namespace ShowTheShortcut
                 Logger.Log(ex);
             }
         }
-        
+
         private static string GetShortcut(Command cmd)
         {
             if (cmd == null || string.IsNullOrEmpty(cmd.Name))
