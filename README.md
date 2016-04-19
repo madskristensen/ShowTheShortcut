@@ -36,6 +36,7 @@ also logged in the Output Window.
 ![Output Window](art/output-window.png)
 
 ### Settings
+You can modify all the settings under **Tools -> Options**
 
 ![Options](art/options.png)
 
