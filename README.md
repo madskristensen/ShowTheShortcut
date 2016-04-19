@@ -20,6 +20,7 @@ See the [changelog](CHANGELOG.md) for changes and roadmap.
 - Displays the keyboard shortcut in the status bar
 - Auto-hides the shortcut after 5 seconds (default setting)
 - Doesn't show when a command was invoked by a shortcut
+- Keeps a log in a separate Output Window pane
 
 When a command is invoked from a button click (such as
 *Edit -> Find and Replace -> Quick Find*) and there is a
