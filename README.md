@@ -27,13 +27,33 @@ When a command is invoked from a button click (such as
 keyboard shortcut bound to that command, that keyboard
 shortcut will be displayed in the status bar.
 
+### Status bar
+By default, the keyboard shortcuts are logged to the status
+bar for 5 seconds.
+
 ![Status bar](art/statusbar.png)
+
+In the settings you can set the timeout to be zero, which
+will persist the status bar indicator until a new shorcut
+is displayed.
+
+A tooltip can be enabled in the settings to give more
+information about the command that was executed when the
+mouse hovers over the status bar.
+
+![Tooltip](art/tooltip.png)
+
+This can be helpful to anyone trying to automate Visual Studio.
 
 ### Output Window
 Every time a shortcut is displayed on the status bar, it is
-also logged in the Output Window.
+also logged in the Output Window. This makes it easy to
+go back in history to find any command that was executed
+earlier.
 
 ![Output Window](art/output-window.png)
+
+This can be disabled in the settings.
 
 ### Settings
 You can modify all the settings under **Tools -> Options**

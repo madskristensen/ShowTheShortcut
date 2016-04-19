@@ -1,8 +1,11 @@
 # Roadmap
 
 - [x] Tooltip on status bar message
+- [x] Option to enable/disable tooltip
 - [x] Shortened long command names
 - [x] New logo
+- [x] More screenshots and documentation
+- [x] Setting for logging to Status Bar
 
 Features that have a checkmark are complete and available for
 download in the

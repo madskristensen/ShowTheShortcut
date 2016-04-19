@@ -45,18 +45,26 @@ namespace ShowTheShortcut
             _timer.Elapsed += (s, e) =>
             {
                 _timer.Stop();
-                _control.Dispatcher.Invoke(() =>
-                {
-                    _control.Visibility = Visibility.Collapsed;
-                });
+                HideControl();
             };
 
             _options.Saved += (s, e) =>
             {
                 SetTimeout();
+
+                if (!_options.LogToStatusBar)
+                    HideControl();
             };
 
             SetTimeout();
+        }
+
+        private void HideControl()
+        {
+            _control.Dispatcher.Invoke(() =>
+            {
+                _control.Visibility = Visibility.Collapsed;
+            });
         }
 
         private void SetTimeout()
@@ -96,17 +104,25 @@ namespace ShowTheShortcut
 
                 if (!string.IsNullOrWhiteSpace(shortcut))
                 {
-                    string prettyName = Prettify(cmd);
-                    string text = $"{prettyName} ({shortcut})";
-                    _control.Visibility = Visibility.Visible;
-                    _control.Text = text;
-                    _control.ToolTip = $@"Name: {cmd.Name}
+                    if (_options.LogToStatusBar)
+                    {
+                        string prettyName = Prettify(cmd);
+                        string text = $"{prettyName} ({shortcut})";
+
+                        _control.Visibility = Visibility.Visible;
+                        _control.Text = text;
+                    }
+
+                    if (_options.ShowTooltip)
+                    {
+                        _control.ToolTip = $@"Name: {cmd.Name}
 Localized: {cmd.LocalizedName}
 GUID: {cmd.Guid}
 ID: {cmd.ID}";
+                    }
 
                     if (_options.LogToOutputWindow)
-                        Logger.Log(text);
+                        Logger.Log($"{cmd.Name} ({shortcut})");
 
                     if (_options.Timeout > 0)
                     {

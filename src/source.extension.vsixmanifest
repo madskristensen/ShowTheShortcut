@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="9da28329-f9d5-4f18-91c3-d3285b103d1a" Version="1.1" Language="en-US" Publisher="Mads Kristensen" />
+        <Identity Id="9da28329-f9d5-4f18-91c3-d3285b103d1a" Version="1.2" Language="en-US" Publisher="Mads Kristensen" />
         <DisplayName>Show The Shortcut</DisplayName>
         <Description xml:space="preserve">Shows the keyboard shortcut for any command that you execute to help you learn the shortcuts you use the most.</Description>
         <MoreInfo>https://github.com/madskristensen/ShowTheShortut</MoreInfo>
