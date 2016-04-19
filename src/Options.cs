@@ -14,9 +14,15 @@ namespace ShowTheShortcut
 
         [Category("General")]
         [DisplayName("Show on shortcut")]
-        [Description("Determines if the status bar should show shortcuts for commands that was invoked by the shortcut.")]
+        [Description("Determines if the status bar should show shortcuts for commands that were invoked by the shortcut.")]
         [DefaultValue(false)]
         public bool ShowOnShortcut { get; set; }
+
+        [Category("General")]
+        [DisplayName("Log to Output Window")]
+        [Description("Log all keyboard shortcuts for commands captured to the Output Window.")]
+        [DefaultValue(true)]
+        public bool LogToOutputWindow { get; set; } = true;
 
         public override void SaveSettingsToStorage()
         {

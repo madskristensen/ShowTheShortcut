@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -15,6 +16,7 @@ namespace ShowTheShortcut
         private Options _options;
         private CommandEvents _events;
         private DTE2 _dte;
+        private static Dictionary<string, string> _cache = new Dictionary<string, string>();
         private Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
         private bool _showShortcut;
         private StatusBarInjector _injector;
@@ -83,15 +85,27 @@ namespace ShowTheShortcut
             if (!_showShortcut)
                 return;
 
-            var cmd = _dte.Commands.Item(Guid, ID);
-            string shortcut = GetShortcut(cmd);
-
-            if (!string.IsNullOrEmpty(shortcut))
+            try
             {
-                _control.Visibility = Visibility.Visible;
-                _control.Text = $"{cmd.Name} ({shortcut})";
-                _timer.Stop();
-                _timer.Start();
+                var cmd = _dte.Commands.Item(Guid, ID);
+                string shortcut = GetShortcut(cmd);
+
+                if (!string.IsNullOrEmpty(shortcut))
+                {
+                    string text = $"{cmd.Name} ({shortcut})";
+                    _control.Visibility = Visibility.Visible;
+                    _control.Text = text;
+
+                    if (_options.LogToOutputWindow)
+                        Logger.Log(text);
+
+                    _timer.Stop();
+                    _timer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
             }
         }
 
@@ -100,12 +114,22 @@ namespace ShowTheShortcut
             if (cmd == null || string.IsNullOrEmpty(cmd.Name))
                 return null;
 
+            string key = cmd.Guid + cmd.ID;
+
+            if (_cache.ContainsKey(key))
+                return _cache[key];
+
             var bindings = ((object[])cmd.Bindings).FirstOrDefault() as string;
 
             if (!string.IsNullOrEmpty(bindings))
             {
                 int index = bindings.IndexOf(':') + 2;
-                return bindings.Substring(index);
+                string shortcut = bindings.Substring(index);
+
+                if (!_cache.ContainsKey(key))
+                    _cache.Add(key, shortcut);
+
+                return shortcut;
             }
 
             return null;

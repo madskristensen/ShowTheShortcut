@@ -11,7 +11,7 @@ Shows the keyboard shortcut for any command that you execute
 to help you learn the shortcuts you use the most.
 
 It is also helpful for presentations where you want to display
-what keyboard shortcuts you are usign to the audience.
+to the audience what keyboard shortcuts you are using.
 
 See the [changelog](CHANGELOG.md) for changes and roadmap.
 
@@ -27,6 +27,12 @@ keyboard shortcut bound to that command, that keyboard
 shortcut will be displayed in the status bar.
 
 ![Status bar](art/statusbar.png)
+
+### Output Window
+Every time a shortcut is displayed on the status bar, it is
+also logged in the Output Window.
+
+![Output Window](art/output-window.png)
 
 ### Settings
 

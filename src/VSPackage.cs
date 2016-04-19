@@ -11,8 +11,6 @@ namespace ShowTheShortcut
     [Guid(Vsix.Id)]
     [ProvideOptionPage(typeof(Options), "Environment\\Keyboard", "Shortcuts", 0, 0, true, ProvidesLocalizedCategoryName = false)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
-    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
-    [ProvideAutoLoad(UIContextGuids80.EmptySolution)]
     public sealed class VSPackage : Package
     {
         protected override void Initialize()
@@ -20,9 +18,18 @@ namespace ShowTheShortcut
             base.Initialize();
             var options = (Options)GetDialogPage(typeof(Options));
 
+            Logger.Initialize(this, Vsix.Name);
+
             Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
             {
-                CommandHandler.Initialize(this, options);
+                try
+                {
+                    CommandHandler.Initialize(this, options);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex);
+                }
 
             }), DispatcherPriority.ApplicationIdle, null);
         }
