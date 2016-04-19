@@ -1,11 +1,6 @@
 # Roadmap
 
-- [x] Tooltip on status bar message
-- [x] Option to enable/disable tooltip
-- [x] Shortened long command names
-- [x] New logo
-- [x] More screenshots and documentation
-- [x] Setting for logging to Status Bar
+- [ ] nothing yet...
 
 Features that have a checkmark are complete and available for
 download in the
@@ -15,6 +10,17 @@ download in the
 
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
+
+## 1.2
+
+**2016-04-19**
+
+- [x] Tooltip on status bar message
+- [x] Option to enable/disable tooltip
+- [x] Shortened long command names
+- [x] New logo
+- [x] More screenshots and documentation
+- [x] Setting for logging to Status Bar
 
 ## 1.1
 
