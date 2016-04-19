@@ -96,9 +96,14 @@ namespace ShowTheShortcut
 
                 if (!string.IsNullOrWhiteSpace(shortcut))
                 {
-                    string text = $"{cmd.LocalizedName} ({shortcut})";
+                    string prettyName = Prettify(cmd);
+                    string text = $"{prettyName} ({shortcut})";
                     _control.Visibility = Visibility.Visible;
                     _control.Text = text;
+                    _control.ToolTip = $@"Name: {cmd.Name}
+Localized: {cmd.LocalizedName}
+GUID: {cmd.Guid}
+ID: {cmd.ID}";
 
                     if (_options.LogToOutputWindow)
                         Logger.Log(text);
@@ -143,6 +148,15 @@ namespace ShowTheShortcut
             }
 
             return null;
+        }
+
+        private static string Prettify(Command cmd)
+        {
+            if (cmd.LocalizedName.Length < 40)
+                return cmd.LocalizedName;
+
+            int index = cmd.LocalizedName.LastIndexOf('.') + 1;
+            return cmd.LocalizedName.Substring(index);
         }
 
         private static bool IsShortcutInteresting(string shortcut)
