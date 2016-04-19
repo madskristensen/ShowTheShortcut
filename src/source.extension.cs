@@ -11,7 +11,7 @@ namespace ShowTheShortcut
         public const string Name = "Show The Shortcut";
         public const string Description = "Shows the keyboard shortcut for any command that you execute to help you learn the shortcuts you use the most.";
         public const string Language = "en-US";
-        public const string Version = "1.0";
+        public const string Version = "1.1";
         public const string Author = "Mads Kristensen";
         public const string Tags = "keyboard, shortcut, commands";
     }
