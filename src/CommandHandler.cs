@@ -54,6 +54,9 @@ namespace ShowTheShortcut
 
                 if (!_options.LogToStatusBar)
                     HideControl();
+
+                if (!_options.LogToOutputWindow)
+                    Logger.DeletePane();
             };
 
             SetTimeout();
