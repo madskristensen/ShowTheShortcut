@@ -1,4 +1,4 @@
-# Show The Shortcut
+# Learn the Shortcut
 
 [![Build status](https://ci.appveyor.com/api/projects/status/3cydl7ohrtn9we2u?svg=true)](https://ci.appveyor.com/project/madskristensen/showtheshortcut)
 
@@ -8,7 +8,7 @@ or get the [CI build](http://vsixgallery.com/extension/9da28329-f9d5-4f18-91c3-d
 ---------------------------------------
 
 Shows the keyboard shortcut for any command that you execute
-to help you learn the shortcuts you use the most.
+to help you learn the shortcuts you need the most.
 
 It is also helpful for presentations where you want to display
 to the audience what keyboard shortcuts you are using.

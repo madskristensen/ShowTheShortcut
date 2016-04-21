@@ -1,6 +1,6 @@
 # Roadmap
 
-- [x] Copy tooltip text on click
+- [ ] Nothing yet...
 
 Features that have a checkmark are complete and available for
 download in the
@@ -10,6 +10,14 @@ download in the
 
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
+
+## 1.3
+
+**2016-04-21**
+
+- [x] Copy tooltip text on click
+- [x] Renamed to _Learn the Shortcut_
+- [x] New logo
 
 ## 1.2
 

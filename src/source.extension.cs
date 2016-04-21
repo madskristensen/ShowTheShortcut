@@ -8,10 +8,10 @@ namespace ShowTheShortcut
     static class Vsix
     {
         public const string Id = "9da28329-f9d5-4f18-91c3-d3285b103d1a";
-        public const string Name = "Show The Shortcut";
-        public const string Description = "Shows the keyboard shortcut for any command that you execute to help you learn the shortcuts you use the most.";
+        public const string Name = "Learn the Shortcut";
+        public const string Description = "Shows the keyboard shortcut for any command that you execute to help you learn the shortcuts you need the most.";
         public const string Language = "en-US";
-        public const string Version = "1.2";
+        public const string Version = "1.3";
         public const string Author = "Mads Kristensen";
         public const string Tags = "keyboard, shortcut, commands";
     }
