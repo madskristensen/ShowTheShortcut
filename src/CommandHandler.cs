@@ -113,6 +113,10 @@ namespace ShowTheShortcut
                     }
                 }
             }
+            catch (ArgumentException ex)
+            {
+                Telemetry.TrackException(ex);
+            }
             catch (Exception ex)
             {
                 Logger.Log(ex);
