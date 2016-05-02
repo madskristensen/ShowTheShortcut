@@ -11,6 +11,12 @@ download in the
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+## 1.4
+
+**2016-05-02**
+
+- [x] Support for "VS15"
+
 ## 1.3
 
 **2016-04-21**
