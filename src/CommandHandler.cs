@@ -19,6 +19,7 @@ namespace ShowTheShortcut
         private bool _showShortcut;
         private Timer _timer;
         private StatusbarControl _control;
+        private static string[] _ignoreCmd = { "Edit.GoToFindCombo" };
 
         private CommandHandler(IServiceProvider provider, Options options)
         {
@@ -87,6 +88,10 @@ namespace ShowTheShortcut
             try
             {
                 var cmd = _dte.Commands.Item(Guid, ID);
+
+                if (string.IsNullOrWhiteSpace(cmd?.Name) || ShouldCommandBeIgnored(cmd))
+                    return;
+
                 string shortcut = GetShortcut(cmd);
 
                 if (!string.IsNullOrWhiteSpace(shortcut))
@@ -170,6 +175,14 @@ namespace ShowTheShortcut
                 return false;
 
             return true;
+        }
+
+        private static bool ShouldCommandBeIgnored(Command cmd)
+        {
+            if (_ignoreCmd.Contains(cmd.Name, StringComparer.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
     }
 }
