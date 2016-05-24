@@ -4,7 +4,7 @@
         <Identity Id="9da28329-f9d5-4f18-91c3-d3285b103d1a" Version="1.4" Language="en-US" Publisher="Mads Kristensen" />
         <DisplayName>Learn the Shortcut</DisplayName>
         <Description xml:space="preserve">Shows how easy you can make the same action using only the keyboard. Displays the keyboard shortcut for any command that you execute to help you learn the shortcuts you need the most.</Description>
-        <MoreInfo>https://github.com/madskristensen/ShowTheShortut</MoreInfo>
+        <MoreInfo>https://github.com/madskristensen/ShowTheShortcut</MoreInfo>
         <License>Resources\LICENSE</License>
         <ReleaseNotes>https://github.com/madskristensen/ShowTheShortcut/blob/master/CHANGELOG.md</ReleaseNotes>
         <Icon>Resources\Icon.png</Icon>
