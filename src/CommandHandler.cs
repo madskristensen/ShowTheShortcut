@@ -19,7 +19,13 @@ namespace ShowTheShortcut
         private bool _showShortcut;
         private Timer _timer;
         private StatusbarControl _control;
-        private static string[] _ignoreCmd = { "Edit.GoToFindCombo" };
+        private static string[] _ignoreCmd =
+        {
+            "Edit.GoToFindCombo",
+            "Debug.LocationToolbar.ProcessCombo",
+            "Debug.LocationToolbar.ThreadCombo",
+            "Debug.LocationToolbar.StackFrameCombo"
+        };
 
         private CommandHandler(IServiceProvider provider, Options options)
         {
