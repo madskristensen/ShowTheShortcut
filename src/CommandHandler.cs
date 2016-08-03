@@ -27,10 +27,10 @@ namespace ShowTheShortcut
             "Debug.LocationToolbar.StackFrameCombo"
         };
 
-        private CommandHandler(IServiceProvider provider, Options options)
+        private CommandHandler(DTE2 dte, Options options)
         {
             _options = options;
-            _dte = (DTE2)provider.GetService(typeof(DTE));
+            _dte = dte;
             _control = new StatusbarControl(options, _dte);
             _events = _dte.Events.CommandEvents;
 
@@ -78,7 +78,8 @@ namespace ShowTheShortcut
 
         public static void Initialize(IServiceProvider provider, Options options)
         {
-            Instance = new CommandHandler(provider, options);
+            var dte = provider.GetService(typeof(DTE)) as DTE2;
+            Instance = new CommandHandler(dte, options);
         }
 
         private void BeforeExecute(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
@@ -123,10 +124,6 @@ namespace ShowTheShortcut
                         _timer.Start();
                     }
                 }
-            }
-            catch (ArgumentException ex)
-            {
-                Telemetry.TrackException(ex);
             }
             catch (Exception ex)
             {

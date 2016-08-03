@@ -6,32 +6,22 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace ShowTheShortcut
 {
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", Vsix.Version, IconResourceID = 400)]
-    [Guid(Vsix.Id)]
     [ProvideOptionPage(typeof(Options), "Environment\\Keyboard", "Shortcuts", 0, 0, true, ProvidesLocalizedCategoryName = false)]
-    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+    [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
+    [Guid(Vsix.Id)]
     public sealed class VSPackage : Package
     {
         protected override void Initialize()
         {
-            base.Initialize();
-            var options = (Options)GetDialogPage(typeof(Options));
-
-            Logger.Initialize(this, Vsix.Name);
-
-            Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
+            ThreadHelper.Generic.BeginInvoke(DispatcherPriority.ApplicationIdle, () =>
             {
-                try
-                {
-                    CommandHandler.Initialize(this, options);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex);
-                }
+                var options = GetDialogPage(typeof(Options)) as Options;
 
-            }), DispatcherPriority.ApplicationIdle, null);
+                Logger.Initialize(this, Vsix.Name);
+                CommandHandler.Initialize(this, options);
+            });
         }
     }
 }
