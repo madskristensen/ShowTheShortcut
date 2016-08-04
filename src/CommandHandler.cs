@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
+using task = System.Threading.Tasks.Task;
 
 namespace ShowTheShortcut
 {
@@ -76,9 +78,9 @@ namespace ShowTheShortcut
 
         public static CommandHandler Instance { get; private set; }
 
-        public static void Initialize(IServiceProvider provider, Options options)
+        public static async task InitializeAsync(AsyncPackage package, Options options)
         {
-            var dte = provider.GetService(typeof(DTE)) as DTE2;
+            var dte = await package.GetServiceAsync(typeof(DTE)) as DTE2;
             Instance = new CommandHandler(dte, options);
         }
 

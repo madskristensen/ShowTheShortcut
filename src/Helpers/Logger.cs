@@ -1,18 +1,24 @@
 using System;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using task = System.Threading.Tasks.Task;
 
 internal static class Logger
 {
     private static string _name;
-    private static Guid _guid = Guid.NewGuid();
+    private static Guid _guid = new Guid();
     private static IVsOutputWindowPane _pane;
-    private static IServiceProvider _provider;
-    private static IVsOutputWindow _outputWindow;
+    private static IVsOutputWindow _output;
 
     public static void Initialize(IServiceProvider provider, string name)
     {
-        _provider = provider;
+        _output = (IVsOutputWindow)provider.GetService(typeof(SVsOutputWindow));
+        _name = name;
+    }
+
+    public static async task InitializeAsync(AsyncPackage package, string name)
+    {
+        _output = await package.GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
         _name = name;
     }
 
@@ -22,10 +28,7 @@ internal static class Logger
         {
             if (EnsurePane())
             {
-                ThreadHelper.Generic.BeginInvoke(() =>
-                {
-                    _pane.OutputStringThreadSafe(DateTime.Now + ": " + message + Environment.NewLine);
-                });
+                _pane.OutputString(DateTime.Now.ToString() + ": " + message + Environment.NewLine);
             }
         }
         catch (Exception ex)
@@ -36,22 +39,18 @@ internal static class Logger
 
     public static void DeletePane()
     {
-        if (_outputWindow != null)
-            _outputWindow.DeletePane(_guid);
+        if (_output != null)
+            _output.DeletePane(_guid);
     }
 
     private static bool EnsurePane()
     {
-        if (_pane == null)
+        if (_pane == null && _output != null)
         {
-            ThreadHelper.Generic.Invoke(() =>
+            ThreadHelper.Generic.BeginInvoke(() =>
             {
-                if (_pane == null)
-                {
-                    _outputWindow = (IVsOutputWindow)_provider.GetService(typeof(SVsOutputWindow));
-                    _outputWindow.CreatePane(ref _guid, _name, 1, 1);
-                    _outputWindow.GetPane(ref _guid, out _pane);
-                }
+                _output.CreatePane(ref _guid, _name, 1, 1);
+                _output.GetPane(ref _guid, out _pane);
             });
         }
 

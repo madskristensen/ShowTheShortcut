@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using task = System.Threading.Tasks.Task;
 using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -11,17 +13,16 @@ namespace ShowTheShortcut
     [ProvideOptionPage(typeof(Options), "Environment\\Keyboard", "Shortcuts", 0, 0, true, ProvidesLocalizedCategoryName = false)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [Guid(Vsix.Id)]
-    public sealed class VSPackage : Package
+    public sealed class VSPackage : AsyncPackage
     {
-        protected override void Initialize()
+        protected override async task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            ThreadHelper.Generic.BeginInvoke(DispatcherPriority.ApplicationIdle, () =>
-            {
-                var options = GetDialogPage(typeof(Options)) as Options;
+            await Logger.InitializeAsync(this, Vsix.Name);
 
-                Logger.Initialize(this, Vsix.Name);
-                CommandHandler.Initialize(this, options);
-            });
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            var options = GetDialogPage(typeof(Options)) as Options;
+
+            await CommandHandler.InitializeAsync(this, options);
         }
     }
 }
