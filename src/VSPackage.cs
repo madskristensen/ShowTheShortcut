@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using task = System.Threading.Tasks.Task;
-using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using task = System.Threading.Tasks.Task;
 
 namespace ShowTheShortcut
 {
