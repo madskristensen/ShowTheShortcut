@@ -58,7 +58,14 @@ namespace ShowTheShortcut
         {
             Dispatcher.Invoke(() =>
             {
-                Visibility = visibility;
+                try
+                {
+                    Visibility = visibility;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex);
+                }
             });
         }
     }
