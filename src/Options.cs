@@ -45,6 +45,12 @@ namespace ShowTheShortcut
         [DefaultValue(true)]
         public bool LogToOutputWindow { get; set; } = true;
 
+        [Category(OutputWindowCategory)]
+        [DisplayName("Log commands without shortcut")]
+        [Description("Log all commands captured to the Output Window.")]
+        [DefaultValue(true)]
+        public bool LogCommandsWithoutShortcut { get; set; } = true;
+
         public override void SaveSettingsToStorage()
         {
             base.SaveSettingsToStorage();
