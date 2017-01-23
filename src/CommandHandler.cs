@@ -26,7 +26,9 @@ namespace ShowTheShortcut
             "Edit.GoToFindCombo",
             "Debug.LocationToolbar.ProcessCombo",
             "Debug.LocationToolbar.ThreadCombo",
-            "Debug.LocationToolbar.StackFrameCombo"
+            "Debug.LocationToolbar.StackFrameCombo",
+            "Build.SolutionPlatforms",
+            "Build.SolutionConfigurations"
         };
 
         private CommandHandler(DTE2 dte, Options options)
@@ -103,28 +105,33 @@ namespace ShowTheShortcut
 
                 string shortcut = GetShortcut(cmd);
 
-                if (!string.IsNullOrWhiteSpace(shortcut))
+                if (string.IsNullOrWhiteSpace(shortcut))
                 {
-                    if (_options.LogToStatusBar)
-                    {
-                        string prettyName = Prettify(cmd);
-                        string text = $"{prettyName} ({shortcut})";
+                    if (_options.LogCommandsWithoutShortcut)
+                        Logger.Log($"{cmd.Name} (no shortcut)");
 
-                        _control.SetVisibility(Visibility.Visible);
-                        _control.Text = text;
-                    }
+                    return;
+                }
 
-                    if (_options.ShowTooltip)
-                        _control.SetTooltip(cmd);
+                if (_options.LogToStatusBar)
+                {
+                    string prettyName = Prettify(cmd);
+                    string text = $"{prettyName} ({shortcut})";
 
-                    if (_options.LogToOutputWindow)
-                        Logger.Log($"{cmd.Name} ({shortcut})");
+                    _control.SetVisibility(Visibility.Visible);
+                    _control.Text = text;
+                }
 
-                    if (_options.Timeout > 0)
-                    {
-                        _timer.Stop();
-                        _timer.Start();
-                    }
+                if (_options.ShowTooltip)
+                    _control.SetTooltip(cmd);
+
+                if (_options.LogToOutputWindow)
+                    Logger.Log($"{cmd.Name} ({shortcut})");
+
+                if (_options.Timeout > 0)
+                {
+                    _timer.Stop();
+                    _timer.Start();
                 }
             }
             catch (Exception ex)
