@@ -98,7 +98,17 @@ namespace ShowTheShortcut
 
             try
             {
-                var cmd = _dte.Commands.Item(Guid, ID);
+                Command cmd = null;
+                try
+                {
+                    cmd = _dte.Commands.Item(Guid, ID);
+                }
+                catch (ArgumentException)
+                {
+                    if (_options.LogToOutputWindow)
+                        Logger.Log($"{Prettify(new Guid(Guid), ID)} (unknown command)");
+                    return;
+                }
 
                 if (string.IsNullOrWhiteSpace(cmd?.Name) || ShouldCommandBeIgnored(cmd))
                     return;
@@ -176,6 +186,11 @@ namespace ShowTheShortcut
 
             int index = cmd.LocalizedName.LastIndexOf('.') + 1;
             return cmd.LocalizedName.Substring(index);
+        }
+
+        private static string Prettify(Guid guid, int id)
+        {
+            return $"Guid={guid:B}, ID=0x{2343:x4}";
         }
 
         private static bool IsShortcutInteresting(string shortcut)
