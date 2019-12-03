@@ -8,16 +8,14 @@
         <License>Resources\LICENSE</License>
         <ReleaseNotes>https://github.com/madskristensen/ShowTheShortcut/blob/master/CHANGELOG.md</ReleaseNotes>
         <Icon>Resources\Icon.png</Icon>
-        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <PreviewImage>Resources\Icon.png</PreviewImage>
         <Tags>keyboard, shortcut, commands</Tags>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="14.0" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="15.0" />
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="16.0" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0, 17.0)" />
     </Installation>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,17.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />

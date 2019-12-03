@@ -1,27 +1,28 @@
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft.VisualStudio.Shell;
+
 using task = System.Threading.Tasks.Task;
 
 namespace ShowTheShortcut
 {
     class CommandHandler
     {
-        private Options _options;
-        private CommandEvents _events;
-        private DTE2 _dte;
-        private static Dictionary<string, string> _cache = new Dictionary<string, string>();
-        private Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
+        private readonly Options _options;
+        private readonly CommandEvents _events;
+        private readonly DTE2 _dte;
+        private static readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
+        private readonly Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
         private bool _showShortcut;
-        private Timer _timer;
-        private StatusbarControl _control;
-        private static string[] _ignoreCmd =
+        private readonly Timer _timer;
+        private readonly StatusbarControl _control;
+        private static readonly string[] _ignoreCmd =
         {
             "Edit.GoToFindCombo",
             "Debug.LocationToolbar.ProcessCombo",
@@ -56,10 +57,14 @@ namespace ShowTheShortcut
                 SetTimeout();
 
                 if (!_options.LogToStatusBar)
+                {
                     _control.SetVisibility(Visibility.Collapsed);
+                }
 
                 if (!_options.LogToOutputWindow)
+                {
                     Logger.DeletePane();
+                }
             };
 
             SetTimeout();
@@ -94,7 +99,9 @@ namespace ShowTheShortcut
         private void AfterExecute(string Guid, int ID, object CustomIn, object CustomOut)
         {
             if (!_showShortcut)
+            {
                 return;
+            }
 
             try
             {
@@ -106,19 +113,26 @@ namespace ShowTheShortcut
                 catch (ArgumentException)
                 {
                     if (_options.LogToOutputWindow)
-                        Logger.Log($"{Prettify(new Guid(Guid), ID)} (unknown command)");
+                    {
+                        Logger.Log($"{Prettify(new Guid(Guid))} (unknown command)");
+                    }
+
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(cmd?.Name) || ShouldCommandBeIgnored(cmd))
+                {
                     return;
+                }
 
                 string shortcut = GetShortcut(cmd);
 
                 if (string.IsNullOrWhiteSpace(shortcut))
                 {
                     if (_options.LogCommandsWithoutShortcut)
+                    {
                         Logger.Log($"{cmd.Name} (no shortcut)");
+                    }
 
                     return;
                 }
@@ -133,10 +147,14 @@ namespace ShowTheShortcut
                 }
 
                 if (_options.ShowTooltip)
+                {
                     _control.SetTooltip(cmd);
+                }
 
                 if (_options.LogToOutputWindow)
+                {
                     Logger.Log($"{cmd.Name} ({shortcut})");
+                }
 
                 if (_options.Timeout > 0)
                 {
@@ -153,12 +171,16 @@ namespace ShowTheShortcut
         private static string GetShortcut(Command cmd)
         {
             if (cmd == null || string.IsNullOrEmpty(cmd.Name))
+            {
                 return null;
+            }
 
             string key = cmd.Guid + cmd.ID;
 
             if (_cache.ContainsKey(key))
+            {
                 return _cache[key];
+            }
 
             var bindings = ((object[])cmd.Bindings).FirstOrDefault() as string;
 
@@ -168,10 +190,14 @@ namespace ShowTheShortcut
                 string shortcut = bindings.Substring(index);
 
                 if (!IsShortcutInteresting(shortcut))
+                {
                     shortcut = null;
+                }
 
                 if (!_cache.ContainsKey(key))
+                {
                     _cache.Add(key, shortcut);
+                }
 
                 return shortcut;
             }
@@ -182,13 +208,15 @@ namespace ShowTheShortcut
         private static string Prettify(Command cmd)
         {
             if (cmd.LocalizedName.Length < 40)
+            {
                 return cmd.LocalizedName;
+            }
 
             int index = cmd.LocalizedName.LastIndexOf('.') + 1;
             return cmd.LocalizedName.Substring(index);
         }
 
-        private static string Prettify(Guid guid, int id)
+        private static string Prettify(Guid guid)
         {
             return $"Guid={guid:B}, ID=0x{2343:x4}";
         }
@@ -196,10 +224,14 @@ namespace ShowTheShortcut
         private static bool IsShortcutInteresting(string shortcut)
         {
             if (string.IsNullOrWhiteSpace(shortcut))
+            {
                 return false;
+            }
 
             if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
+            {
                 return false;
+            }
 
             return true;
         }
@@ -207,7 +239,9 @@ namespace ShowTheShortcut
         private static bool ShouldCommandBeIgnored(Command cmd)
         {
             if (_ignoreCmd.Contains(cmd.Name, StringComparer.OrdinalIgnoreCase))
+            {
                 return true;
+            }
 
             return false;
         }
