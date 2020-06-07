@@ -1,6 +1,9 @@
 using EnvDTE;
+
 using EnvDTE80;
+
 using Microsoft.VisualStudio.Shell;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,238 +15,247 @@ using task = System.Threading.Tasks.Task;
 
 namespace ShowTheShortcut
 {
-    class CommandHandler
-    {
-        private readonly Options _options;
-        private readonly CommandEvents _events;
-        private readonly DTE2 _dte;
-        private static readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
-        private readonly Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
-        private bool _showShortcut;
-        private readonly Timer _timer;
-        private readonly StatusbarControl _control;
-        private static readonly string[] _ignoreCmd =
-        {
-            "Edit.GoToFindCombo",
-            "Debug.LocationToolbar.ProcessCombo",
-            "Debug.LocationToolbar.ThreadCombo",
-            "Debug.LocationToolbar.StackFrameCombo",
-            "Build.SolutionPlatforms",
-            "Build.SolutionConfigurations"
-        };
+	internal class CommandHandler
+	{
+		private readonly Options _options;
+		private readonly CommandEvents _events;
+		private readonly DTE2 _dte;
+		private static readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
+		private readonly Key[] _keys = { Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.LeftShift, Key.RightShift };
+		private bool _showShortcut;
+		private readonly Timer _timer;
+		private readonly StatusbarControl _control;
+		private static readonly string[] _ignoreCmd =
+		{
+			"Edit.GoToFindCombo",
+			"Debug.LocationToolbar.ProcessCombo",
+			"Debug.LocationToolbar.ThreadCombo",
+			"Debug.LocationToolbar.StackFrameCombo",
+			"Build.SolutionPlatforms",
+			"Build.SolutionConfigurations"
+		};
 
-        private CommandHandler(DTE2 dte, Options options)
-        {
-            _options = options;
-            _dte = dte;
-            _control = new StatusbarControl(options, _dte);
-            _events = _dte.Events.CommandEvents;
+		private CommandHandler(DTE2 dte, Options options)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
 
-            _events.AfterExecute += AfterExecute;
-            _events.BeforeExecute += BeforeExecute;
+			_options = options;
+			_dte = dte;
+			_control = new StatusbarControl(options, _dte);
+			_events = _dte.Events.CommandEvents;
 
-            var injector = new StatusBarInjector(Application.Current.MainWindow);
-            injector.InjectControl(_control);
+			_events.AfterExecute += AfterExecute;
+			_events.BeforeExecute += BeforeExecute;
 
-            _timer = new Timer();
-            _timer.Elapsed += (s, e) =>
-            {
-                _timer.Stop();
-                _control.SetVisibility(Visibility.Collapsed);
-            };
+			StatusBarInjector injector = new StatusBarInjector(Application.Current.MainWindow);
+			injector.InjectControlAsync(_control).ConfigureAwait(false);
 
-            _options.Saved += (s, e) =>
-            {
-                SetTimeout();
+			_timer = new Timer();
+			_timer.Elapsed += (s, e) =>
+			{
+				_timer.Stop();
+				_control.SetVisibilityAsync(Visibility.Collapsed).ConfigureAwait(false);
+			};
 
-                if (!_options.LogToStatusBar)
-                {
-                    _control.SetVisibility(Visibility.Collapsed);
-                }
+			_options.Saved += (s, e) =>
+			{
+				SetTimeout();
 
-                if (!_options.LogToOutputWindow)
-                {
-                    Logger.DeletePane();
-                }
-            };
+				if (!_options.LogToStatusBar)
+				{
+					_control.SetVisibilityAsync(Visibility.Collapsed).ConfigureAwait(false);
+				}
 
-            SetTimeout();
-        }
+				if (!_options.LogToOutputWindow)
+				{
+					Logger.DeletePaneAsync().ConfigureAwait(false);
+				}
+			};
 
-        private void SetTimeout()
-        {
-            if (_options.Timeout > 0)
-            {
-                _timer.Interval = _options.Timeout * 1000;
-                _timer.Start();
-            }
-            else
-            {
-                _timer.Stop();
-            }
-        }
+			SetTimeout();
+		}
 
-        public static CommandHandler Instance { get; private set; }
+		private void SetTimeout()
+		{
+			if (_options.Timeout > 0)
+			{
+				_timer.Interval = _options.Timeout * 1000;
+				_timer.Start();
+			}
+			else
+			{
+				_timer.Stop();
+			}
+		}
 
-        public static async task InitializeAsync(AsyncPackage package, Options options)
-        {
-            var dte = await package.GetServiceAsync(typeof(DTE)) as DTE2;
-            Instance = new CommandHandler(dte, options);
-        }
+		public static CommandHandler Instance { get; private set; }
 
-        private void BeforeExecute(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
-        {
-            _showShortcut = _options.ShowOnShortcut ? true : !_keys.Any(key => Keyboard.IsKeyDown(key));
-        }
+		public static async task InitializeAsync(AsyncPackage package, Options options)
+		{
+			DTE2 dte = await package.GetServiceAsync(typeof(DTE)) as DTE2;
+			Instance = new CommandHandler(dte, options);
+		}
 
-        private void AfterExecute(string Guid, int ID, object CustomIn, object CustomOut)
-        {
-            if (!_showShortcut)
-            {
-                return;
-            }
+		private void BeforeExecute(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
+		{
+			_showShortcut = _options.ShowOnShortcut || !_keys.Any(key => Keyboard.IsKeyDown(key));
+		}
 
-            try
-            {
-                Command cmd = null;
-                try
-                {
-                    cmd = _dte.Commands.Item(Guid, ID);
-                }
-                catch (ArgumentException)
-                {
-                    if (_options.LogToOutputWindow)
-                    {
-                        Logger.Log($"{Prettify(new Guid(Guid))} (unknown command)");
-                    }
+		private void AfterExecute(string Guid, int ID, object CustomIn, object CustomOut)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
 
-                    return;
-                }
+			if (!_showShortcut)
+			{
+				return;
+			}
 
-                if (string.IsNullOrWhiteSpace(cmd?.Name) || ShouldCommandBeIgnored(cmd))
-                {
-                    return;
-                }
+			try
+			{
+				Command cmd = null;
+				try
+				{
+					cmd = _dte.Commands.Item(Guid, ID);
+				}
+				catch (ArgumentException)
+				{
+					if (_options.LogToOutputWindow)
+					{
+						Logger.LogAsync($"{Prettify(new Guid(Guid))} (unknown command)").ConfigureAwait(false);
+					}
 
-                string shortcut = GetShortcut(cmd);
+					return;
+				}
 
-                if (string.IsNullOrWhiteSpace(shortcut))
-                {
-                    if (_options.LogCommandsWithoutShortcut)
-                    {
-                        Logger.Log($"{cmd.Name} (no shortcut)");
-                    }
+				if (string.IsNullOrWhiteSpace(cmd?.Name) || ShouldCommandBeIgnored(cmd))
+				{
+					return;
+				}
 
-                    return;
-                }
+				string shortcut = GetShortcut(cmd);
 
-                if (_options.LogToStatusBar)
-                {
-                    string prettyName = Prettify(cmd);
-                    string text = $"{prettyName} ({shortcut})";
+				if (string.IsNullOrWhiteSpace(shortcut))
+				{
+					if (_options.LogCommandsWithoutShortcut)
+					{
+						Logger.LogAsync($"{cmd.Name} (no shortcut)").ConfigureAwait(false);
+					}
 
-                    _control.SetVisibility(Visibility.Visible);
-                    _control.Text = text;
-                }
+					return;
+				}
 
-                if (_options.ShowTooltip)
-                {
-                    _control.SetTooltip(cmd);
-                }
+				if (_options.LogToStatusBar)
+				{
+					string prettyName = Prettify(cmd);
+					string text = $"{prettyName} ({shortcut})";
 
-                if (_options.LogToOutputWindow)
-                {
-                    Logger.Log($"{cmd.Name} ({shortcut})");
-                }
+					_control.SetVisibilityAsync(Visibility.Visible).ConfigureAwait(false);
+					_control.Text = text;
+				}
 
-                if (_options.Timeout > 0)
-                {
-                    _timer.Stop();
-                    _timer.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-            }
-        }
+				if (_options.ShowTooltip)
+				{
+					_control.SetTooltip(cmd);
+				}
 
-        private static string GetShortcut(Command cmd)
-        {
-            if (cmd == null || string.IsNullOrEmpty(cmd.Name))
-            {
-                return null;
-            }
+				if (_options.LogToOutputWindow)
+				{
+					Logger.LogAsync($"{cmd.Name} ({shortcut})").ConfigureAwait(false);
+				}
 
-            string key = cmd.Guid + cmd.ID;
+				if (_options.Timeout > 0)
+				{
+					_timer.Stop();
+					_timer.Start();
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.LogAsync(ex).ConfigureAwait(false);
+			}
+		}
 
-            if (_cache.ContainsKey(key))
-            {
-                return _cache[key];
-            }
+		private static string GetShortcut(Command cmd)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
 
-            var bindings = ((object[])cmd.Bindings).FirstOrDefault() as string;
+			if (cmd == null || string.IsNullOrEmpty(cmd.Name))
+			{
+				return null;
+			}
 
-            if (!string.IsNullOrEmpty(bindings))
-            {
-                int index = bindings.IndexOf(':') + 2;
-                string shortcut = bindings.Substring(index);
+			string key = cmd.Guid + cmd.ID;
 
-                if (!IsShortcutInteresting(shortcut))
-                {
-                    shortcut = null;
-                }
+			if (_cache.ContainsKey(key))
+			{
+				return _cache[key];
+			}
 
-                if (!_cache.ContainsKey(key))
-                {
-                    _cache.Add(key, shortcut);
-                }
+			string bindings = ((object[])cmd.Bindings).FirstOrDefault() as string;
 
-                return shortcut;
-            }
+			if (!string.IsNullOrEmpty(bindings))
+			{
+				int index = bindings.IndexOf(':') + 2;
+				string shortcut = bindings.Substring(index);
 
-            return null;
-        }
+				if (!IsShortcutInteresting(shortcut))
+				{
+					shortcut = null;
+				}
 
-        private static string Prettify(Command cmd)
-        {
-            if (cmd.LocalizedName.Length < 40)
-            {
-                return cmd.LocalizedName;
-            }
+				if (!_cache.ContainsKey(key))
+				{
+					_cache.Add(key, shortcut);
+				}
 
-            int index = cmd.LocalizedName.LastIndexOf('.') + 1;
-            return cmd.LocalizedName.Substring(index);
-        }
+				return shortcut;
+			}
 
-        private static string Prettify(Guid guid)
-        {
-            return $"Guid={guid:B}, ID=0x{2343:x4}";
-        }
+			return null;
+		}
 
-        private static bool IsShortcutInteresting(string shortcut)
-        {
-            if (string.IsNullOrWhiteSpace(shortcut))
-            {
-                return false;
-            }
+		private static string Prettify(Command cmd)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
-            {
-                return false;
-            }
+			if (cmd.LocalizedName.Length < 40)
+			{
+				return cmd.LocalizedName;
+			}
 
-            return true;
-        }
+			int index = cmd.LocalizedName.LastIndexOf('.') + 1;
+			return cmd.LocalizedName.Substring(index);
+		}
 
-        private static bool ShouldCommandBeIgnored(Command cmd)
-        {
-            if (_ignoreCmd.Contains(cmd.Name, StringComparer.OrdinalIgnoreCase))
-            {
-                return true;
-            }
+		private static string Prettify(Guid guid)
+		{
+			return $"Guid={guid:B}, ID=0x{2343:x4}";
+		}
 
-            return false;
-        }
-    }
+		private static bool IsShortcutInteresting(string shortcut)
+		{
+			if (string.IsNullOrWhiteSpace(shortcut))
+			{
+				return false;
+			}
+
+			if (!shortcut.Contains("Ctrl") && !shortcut.Contains("Alt") && !shortcut.Contains("Shift"))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		private static bool ShouldCommandBeIgnored(Command cmd)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+			if (_ignoreCmd.Contains(cmd.Name, StringComparer.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			return false;
+		}
+	}
 }
