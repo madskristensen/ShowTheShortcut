@@ -53,36 +53,21 @@ namespace ShowTheShortcut
 		private void FindStatusBar()
 		{
 			_statusBar = FindChild(_window, "StatusBarContainer") as FrameworkElement;
-			_panel = _statusBar.Parent as DockPanel;
+			_panel = _statusBar?.Parent as DockPanel;
 		}
 
-		public async System.Threading.Tasks.Task InjectControlAsync(FrameworkElement pControl)
+		public async System.Threading.Tasks.Task InjectControlAsync(FrameworkElement element)
 		{
+			if (_panel == null)
+			{
+				return;
+			}
+
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-			pControl.SetValue(DockPanel.DockProperty, Dock.Left);
-			_panel.Children.Insert(1, pControl);
+			element.SetValue(DockPanel.DockProperty, Dock.Left);
+			_panel.Children.Insert(1, element);
 		}
-
-		//public bool IsInjected(FrameworkElement pControl)
-		//{
-		//	bool flag2 = false;
-
-		//	_panel.Dispatcher.Invoke(() =>
-		//	{
-		//		bool flag = _panel.Children.Contains(pControl);
-		//		bool flag1 = flag;
-		//		flag2 = flag;
-		//		return flag1;
-		//	});
-
-		//	return flag2;
-		//}
-
-		//public void UninjectControl(FrameworkElement pControl)
-		//{
-		//	_panel.Dispatcher.Invoke(() => _panel.Children.Remove(pControl));
-		//}
 
 		private void WindowInitialized(object sender, EventArgs e)
 		{
