@@ -105,7 +105,7 @@ namespace ShowTheShortcut
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			if (!_showShortcut)
+			if (!_showShortcut || !(CustomIn is null) || !(CustomOut is null))
 			{
 				return;
 			}
