@@ -132,15 +132,10 @@ namespace ShowTheShortcut
 					return;
 				}
 
-				string shortcut = GetShortcut(cmd);
+				var shortcut = GetShortcut(cmd);
 
 				if (string.IsNullOrWhiteSpace(shortcut))
 				{
-					if (_options.LogCommandsWithoutShortcut)
-					{
-						Logger.LogAsync($"{cmd.Name} (no shortcut)").ConfigureAwait(false);
-					}
-
 					return;
 				}
 
