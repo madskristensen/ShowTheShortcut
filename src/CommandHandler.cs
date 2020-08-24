@@ -119,11 +119,6 @@ namespace ShowTheShortcut
 				}
 				catch (ArgumentException)
 				{
-					if (_options.LogToOutputWindow)
-					{
-						Logger.LogAsync($"{Prettify(new Guid(Guid))} (unknown command)").ConfigureAwait(false);
-					}
-
 					return;
 				}
 
