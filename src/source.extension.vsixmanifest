@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="9da28329-f9d5-4f18-91c3-d3285b103d1a" Version="1.4" Language="en-US" Publisher="Mads Kristensen" />
-        <DisplayName>Learn the Shortcut</DisplayName>
+        <Identity Id="9da28329-f9d5-4f18-91c3-d3285b103d1b" Version="2.0" Language="en-US" Publisher="Mads Kristensen" />
+        <DisplayName>Learn the Shortcut (64-bit)</DisplayName>
         <Description xml:space="preserve">Shows how easy you can make the same action using only the keyboard. Displays the keyboard shortcut for any command that you execute to help you learn the shortcuts you need the most.</Description>
         <MoreInfo>https://github.com/madskristensen/ShowTheShortcut</MoreInfo>
         <License>Resources\LICENSE</License>
@@ -12,7 +12,12 @@
         <Tags>keyboard, shortcut, commands</Tags>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[15.0, 17.0)" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+        <InstallationTarget Version="[17.0, 18.0)" Id="Microsoft.VisualStudio.Community">
+            <ProductArchitecture>arm64</ProductArchitecture>
+        </InstallationTarget>
     </Installation>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />

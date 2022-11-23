@@ -1,25 +1,12 @@
-using Microsoft.VisualStudio.Shell;
-
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ShowTheShortcut
 {
-	internal class StatusBarInjector
+	internal static class StatusBarInjector
 	{
-		private readonly Window _window;
-		private FrameworkElement _statusBar;
-		private Panel _panel;
-
-		public StatusBarInjector(Window pWindow)
-		{
-			_window = pWindow;
-			_window.Initialized += new EventHandler(WindowInitialized);
-
-			FindStatusBar();
-		}
+		private static Panel _panel;
 
 		private static DependencyObject FindChild(DependencyObject parent, string childName)
 		{
@@ -50,27 +37,26 @@ namespace ShowTheShortcut
 			return null;
 		}
 
-		private void FindStatusBar()
+		private static async Task EnsureUIAsync()
 		{
-			_statusBar = FindChild(_window, "StatusBarContainer") as FrameworkElement;
-			_panel = _statusBar?.Parent as DockPanel;
+			while (_panel is null)
+			{
+				_panel = FindChild(Application.Current.MainWindow, "StatusBarPanel") as DockPanel;
+				if (_panel is null)
+				{
+					// Start window is showing. Need to wait for status bar render.
+					await Task.Delay(5000);
+				}
+			}
 		}
 
-		public async System.Threading.Tasks.Task InjectControlAsync(FrameworkElement element)
+		public static async Task InjectControlAsync(FrameworkElement element)
 		{
-			if (_panel == null)
-			{
-				return;
-			}
-
 			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+			await EnsureUIAsync();
 
 			element.SetValue(DockPanel.DockProperty, Dock.Left);
 			_panel.Children.Insert(1, element);
-		}
-
-		private void WindowInitialized(object sender, EventArgs e)
-		{
 		}
 	}
 }

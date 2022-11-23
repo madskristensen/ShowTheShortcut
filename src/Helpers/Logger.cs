@@ -27,7 +27,7 @@ internal static class Logger
 		{
 			if (EnsurePane())
 			{
-				_pane.OutputString(DateTime.Now.ToShortTimeString() + ": " + message + Environment.NewLine);
+				_pane.OutputStringThreadSafe(DateTime.Now.ToShortTimeString() + ": " + message + Environment.NewLine);
 			}
 		}
 		catch (Exception ex)
