@@ -1,29 +1,28 @@
-﻿using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿global using System;
+global using Microsoft.VisualStudio.Shell;
+global using Task = System.Threading.Tasks.Task;
 
-using System;
+using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
 using System.Threading;
-
-using task = System.Threading.Tasks.Task;
 
 namespace ShowTheShortcut
 {
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("#110", "#112", Vsix.Version)]
 	[ProvideOptionPage(typeof(Options), "Environment\\Keyboard", "Shortcuts", 0, 0, true, ProvidesLocalizedCategoryName = false)]
-	[ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
+	[ProvideAutoLoad(VSConstants.UICONTEXT.ShellInitialized_string, PackageAutoLoadFlags.BackgroundLoad)]
 	[Guid(Vsix.Id)]
 	public sealed class VSPackage : AsyncPackage
 	{
-		protected override async task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
+		protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 		{
 			await JoinableTaskFactory.SwitchToMainThreadAsync();
 			await Logger.InitializeAsync(this, Vsix.Name);
 
 			Options options = GetDialogPage(typeof(Options)) as Options;
 
-			await CommandHandler.InitializeAsync(this, options);
+			CommandHandler.InitializeAsync(this, options).FileAndForget(Vsix.Name);
 		}
 	}
 }

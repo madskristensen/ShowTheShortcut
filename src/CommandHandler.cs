@@ -47,8 +47,7 @@ namespace ShowTheShortcut
 			_events.AfterExecute += AfterExecute;
 			_events.BeforeExecute += BeforeExecute;
 
-			StatusBarInjector injector = new StatusBarInjector(Application.Current.MainWindow);
-			injector.InjectControlAsync(_control).ConfigureAwait(false);
+			StatusBarInjector.InjectControlAsync(_control).ConfigureAwait(false);
 
 			_timer = new Timer();
 			_timer.Elapsed += (s, e) =>
