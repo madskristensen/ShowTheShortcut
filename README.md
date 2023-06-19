@@ -3,7 +3,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/3cydl7ohrtn9we2u?svg=true)](https://ci.appveyor.com/project/madskristensen/showtheshortcut)
 
 Download this extension from the [VS Gallery](https://visualstudiogallery.msdn.microsoft.com/29f07f2c-68aa-47fa-b1c3-48065209b110)
-or get the [CI build](http://vsixgallery.com/extension/9da28329-f9d5-4f18-91c3-d3285b103d1a/).
+or get the [CI build](https://www.vsixgallery.com/extension/9da28329-f9d5-4f18-91c3-d3285b103d1b/).
 
 ---------------------------------------
 
